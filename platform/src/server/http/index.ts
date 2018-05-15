@@ -1,9 +1,9 @@
-import { Observable } from '@kbn/observable';
+import { Observable } from '../../lib/kbn_observable';
 
-import { Env } from '../../config';
+import { Env } from '../config';
 import { HttpService } from './http_service';
 import { HttpConfig } from './http_config';
-import { LoggerFactory } from '../../logging';
+import { LoggerFactory } from '../logging';
 
 export { Router, KibanaRequest } from './router';
 export { HttpService };

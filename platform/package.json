@@ -11,10 +11,11 @@
     "kbn:watch": "yarn build --watch"
   },
   "dependencies": {
-    "@kbn/observable": "link:../packages/kbn-observable",
+    "@kbn/internal-native-observable": "link:../packages/kbn-internal-native-observable",
     "@kbn/utils": "link:../packages/kbn-utils",
     "hapi": "^17.4.0",
     "rxjs": "^6.1.0",
+    "symbol-observable": "^1.2.0",
     "type-detect": "^4.0.8"
   },
   "devDependencies": {

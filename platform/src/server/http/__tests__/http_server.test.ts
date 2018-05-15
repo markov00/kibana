@@ -7,11 +7,11 @@ import supertest from 'supertest';
 import Chance from 'chance';
 
 import { ByteSizeValue } from '@kbn/utils';
-import { Env } from '../../../config';
+import { Env } from '../../config';
 import { Router } from '../router';
 import { HttpServer } from '../http_server';
 import { HttpConfig } from '../http_config';
-import { logger } from '../../../logging/__mocks__';
+import { logger } from '../../logging/__mocks__';
 
 const chance = new Chance();
 

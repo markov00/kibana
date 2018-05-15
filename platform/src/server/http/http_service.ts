@@ -4,12 +4,12 @@ import {
   k$,
   first,
   toPromise,
-} from '@kbn/observable';
+} from '../../lib/kbn_observable';
 
-import { Env } from '../../config';
+import { Env } from '../config';
 import { HttpServer } from './http_server';
 import { HttpConfig } from './http_config';
-import { Logger, LoggerFactory } from '../../logging';
+import { Logger, LoggerFactory } from '../logging';
 import { Router } from './router';
 import { CoreService } from '../../types/core_service';
 

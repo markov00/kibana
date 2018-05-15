@@ -1,4 +1,4 @@
-import { pick } from '../../../lib/utils';
+import { pick } from '../../../utils';
 
 export interface Headers {
   [key: string]: string | string[] | undefined;

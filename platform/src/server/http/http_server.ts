@@ -4,10 +4,10 @@ import { readFileSync } from 'fs';
 import { format as formatUrl } from 'url';
 
 import { HttpConfig } from './http_config';
-import { Env } from '../../config';
-import { Logger } from '../../logging';
+import { Env } from '../config';
+import { Logger } from '../logging';
 import { Router } from './router';
-import { modifyUrl } from '../../lib/utils/url';
+import { modifyUrl } from '../../utils';
 
 export class HttpServer {
   private _server?: Server;

@@ -1,5 +1,5 @@
 import { SslConfig } from './ssl_config';
-import { Env } from '../../config';
+import { Env } from '../config';
 import { ByteSizeValue, schema } from '@kbn/utils';
 
 const validHostnameRegex = /^(([A-Z0-9]|[A-Z0-9][A-Z0-9\-]*[A-Z0-9])\.)*([A-Z0-9]|[A-Z0-9][A-Z0-9\-]*[A-Z0-9])$/i;
