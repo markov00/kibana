@@ -358,7 +358,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               await monacoEditor.setCodeEditorValue(
                 `from ${indexes
                   .map(({ index }) => index)
-                  .join(', ')} | stats averageB = avg(bytes) by extension`
+                  .join(', ')} | stats averageB = avg(bytes) by extension | limit 1000`
               );
               await testSubjects.click('querySubmitButton');
               await header.waitUntilLoadingHasFinished();
@@ -564,7 +564,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
               await monacoEditor.setCodeEditorValue(
                 `from ${indexes
                   .map(({ index }) => index)
-                  .join(', ')} | stats averageB = avg(bytes) by extension`
+                  .join(', ')} | stats averageB = avg(bytes) by extension  | limit 1000`
               );
               await testSubjects.click('querySubmitButton');
               await header.waitUntilLoadingHasFinished();

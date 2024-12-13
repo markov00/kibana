@@ -156,7 +156,7 @@ export default function ({ getService, getPageObjects }: FtrProviderContext) {
       await dashboardAddPanel.clickAddNewPanelFromUIActionLink('ES|QL');
       await dashboardAddPanel.expectEditorMenuClosed();
 
-      const ESQL_QUERY = 'from logs* | stats maxB = max(bytes)';
+      const ESQL_QUERY = 'from logs* | stats maxB = max(bytes) | limit 1';
       // Configure the ES|QL chart
       await monacoEditor.setCodeEditorValue(ESQL_QUERY);
       await testSubjects.click('ESQLEditor-run-query-button');
