@@ -139,20 +139,24 @@ export const createFilterESQL = async (
   rowIndex: number
 ) => {
   const column = table?.columns?.[columnIndex];
+  console.log(column);
   if (
     !column?.meta?.sourceParams?.sourceField ||
     column.meta.sourceParams?.sourceField === '___records___'
   ) {
+    console.log('NO FILTER BECAUSE NO SOURCEFIELD');
     return [];
   }
   const sourceParams = column.meta.sourceParams;
   if (!isSourceParamsESQL(sourceParams)) {
+    console.log('NO FILTER BECAUSE NO isSourceParamsESQL');
     return [];
   }
   const { indexPattern, sourceField, operationType, interval } = sourceParams;
 
   const value = rowIndex > -1 ? table.rows[rowIndex][column.id] : null;
   if (value == null) {
+    console.log('NO FILTER BECAUSE NO VALUE');
     return [];
   }
 
@@ -164,14 +168,15 @@ export const createFilterESQL = async (
         sourceField,
         {
           gte: value,
-          lt: value + (interval || 0),
-          ...(operationType === 'date_hisotgram' ? { format: 'strict_date_optional_time' } : {}),
+          lt: value + (interval ?? 0),
+          ...(operationType === 'date_histogram' ? { format: 'strict_date_optional_time' } : {}),
         },
         value,
         indexPattern
       )
     );
   } else {
+    console.log('build a simple exist');
     filters.push(buildSimpleExistFilter(sourceField, indexPattern));
   }
 
@@ -183,27 +188,22 @@ export const createFiltersFromValueClickAction = async ({
   data,
   negate,
 }: ValueClickDataContext) => {
+  console.log('createFiltersFromValueClickAction');
   const filters: Filter[] = [];
 
-  await Promise.all(
-    data
-      .filter((point) => point)
-      .map(async (val) => {
-        const { table, column, row } = val;
-        const filter =
-          table.meta?.type === 'es_ql'
-            ? await createFilterESQL(table, column, row)
-            : (await createFilter(table, column, row)) || [];
-        if (filter) {
-          filter.forEach((f) => {
-            if (negate) {
-              f = toggleFilterNegated(f);
-            }
-            filters.push(f);
-          });
-        }
-      })
-  );
+  for (const value of data) {
+    if (!value) {
+      continue;
+    }
+    const { table, column, row } = value;
+    const filter =
+      table.meta?.type === 'es_ql'
+        ? await createFilterESQL(table, column, row)
+        : (await createFilter(table, column, row)) ?? [];
+    filter.forEach((f) => {
+      filters.push(negate ? toggleFilterNegated(f) : f);
+    });
+  }
 
   return _.uniqWith(mapAndFlattenFilters(filters), (a, b) =>
     compareFilters(a, b, COMPARE_ALL_OPTIONS)

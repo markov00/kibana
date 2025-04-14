@@ -43,6 +43,7 @@ import type { FieldFormat } from '@kbn/field-formats-plugin/common';
 import { getOverridesFor } from '@kbn/chart-expressions-common';
 import { useKbnPalettes } from '@kbn/palettes';
 import { useAppFixedViewport } from '@kbn/core-rendering-browser';
+import { isOfAggregateQueryType } from '@kbn/es-query';
 import { consolidateMetricColumns } from '../../common/utils';
 import { DEFAULT_PERCENT_DECIMALS } from '../../common/constants';
 import {
@@ -409,8 +410,10 @@ const PartitionVisComponent = (props: PartitionVisComponentProps) => {
     : undefined;
 
   const isEsqlMode = originalVisData?.meta?.type === ESQL_TABLE_TYPE;
+  const applicationQuery = services.data.query.queryString.getQuery();
   const hasTooltipActions =
-    interactive && !isEsqlMode && bucketAccessors.filter((a) => a !== 'metric-name').length > 0;
+    (!isEsqlMode || (isEsqlMode && applicationQuery && isOfAggregateQueryType(applicationQuery))) &&
+    bucketAccessors.filter((a) => a !== 'metric-name').length > 0;
 
   const tooltip: TooltipProps = {
     ...(fixedViewPort ? { boundary: fixedViewPort } : {}),
@@ -576,6 +579,18 @@ const PartitionVisComponent = (props: PartitionVisComponentProps) => {
                   );
                 }}
                 legendAction={legendActions}
+                //   ({ series: [pieSeries] }) => {
+                //   return (
+                //     <button
+                //       onClick={() => {
+                //         const filterData = getLegendActionEventData(visData)(pieSeries);
+                //         handleLegendAction(filterData);
+                //       }}
+                //     >
+                //       ciao
+                //     </button>
+                //   );
+                // }}
                 theme={[
                   // Chart background should be transparent for the usage at Canvas.
                   { background: { color: 'transparent' } },

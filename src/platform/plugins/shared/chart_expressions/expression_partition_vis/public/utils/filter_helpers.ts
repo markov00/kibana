@@ -24,6 +24,7 @@ export const canFilter = async (
     return false;
   }
   const filters = await actions.createFiltersFromValueClickAction(event.data);
+  console.log('can filter', event, actions, filters);
   return Boolean(filters.length);
 };
 

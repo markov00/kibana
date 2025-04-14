@@ -94,6 +94,8 @@ export const getLegendActions = (
       );
     }
 
+    console.log(filterData, panelItems, isFilterable, compatibleCellActions);
+
     const columnMeta = visData.columns[columnIndex].meta;
     compatibleCellActions.forEach((action) => {
       panelItems.push({

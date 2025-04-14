@@ -150,7 +150,7 @@ export class DataPublicPlugin
       }))
     );
 
-    uiActions.addTriggerAction(
+    uiActions.addTriggerActionAsync(
       'VALUE_CLICK_TRIGGER',
       createValueClickActionDefinition(() => ({
         uiActions,

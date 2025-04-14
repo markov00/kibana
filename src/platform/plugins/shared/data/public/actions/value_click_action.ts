@@ -44,6 +44,7 @@ export function createValueClickActionDefinition(
     id: ACTION_VALUE_CLICK,
     shouldAutoExecute: async () => true,
     isCompatible: async (context: ValueClickContext) => {
+      console.log('IS COMPATIBLE');
       if (context.data.query && isOfAggregateQueryType(context.data.query)) {
         const queryString = await appendFilterToESQLQueryFromValueClickAction(context.data);
         return queryString != null;
@@ -52,6 +53,7 @@ export function createValueClickActionDefinition(
       return filters.length > 0;
     },
     execute: async (context: ValueClickActionContext) => {
+      console.log('EXECUTE VALUE CLICK ACTION');
       try {
         if (context.data.query && isOfAggregateQueryType(context.data.query)) {
           // ES|QL charts have a different way of applying filters,

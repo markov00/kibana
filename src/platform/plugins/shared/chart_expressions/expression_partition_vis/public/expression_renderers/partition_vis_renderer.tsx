@@ -128,6 +128,7 @@ export const getPartitionVisRenderer: (
     };
 
     handlers.event(chartSizeEvent);
+    console.log('PARTION VIS RENDERER');
 
     render(
       <KibanaRenderContextProvider {...core}>

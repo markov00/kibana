@@ -91,6 +91,8 @@ export const getLegendAction = (
         execute: () => action.execute(cellValueActionData),
       })) ?? [];
 
+    console.log(legendCellValueActions);
+
     return (
       <LegendActionPopover
         label={
