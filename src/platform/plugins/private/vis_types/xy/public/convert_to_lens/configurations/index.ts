@@ -16,6 +16,7 @@ import type {
 } from '@kbn/lens-common';
 import { SeriesTypes } from '@kbn/lens-common';
 import type { Vis } from '@kbn/visualizations-plugin/public';
+
 import type { Layer } from '..';
 import type { ChartType } from '../../../common';
 import type {
@@ -142,7 +143,7 @@ function getDataLayers(
       seriesType,
       xAccessor: xColumn?.columnId,
       simpleView: false,
-      splitAccessor,
+      splitAccessor: splitAccessor ? [splitAccessor] : undefined,
       palette: vis.params.palette ?? vis.type.visConfig.defaults.palette,
       yConfig: layer.metrics.map((metricId) => {
         const serie = series.find((s) => s.data.id === layer.seriesIdsMap[metricId]);

@@ -125,7 +125,7 @@ export const getLayers = async (
         ...commonProps,
         xAccessor: dataSourceLayer.columns.find((column) => column.isBucketed && !column.isSplit)
           ?.columnId,
-        splitAccessor,
+        splitAccessor: splitAccessor ? [splitAccessor] : undefined,
         collapseFn: seriesAgg,
         palette: getPalette(series.palette as PaletteOutput),
       };

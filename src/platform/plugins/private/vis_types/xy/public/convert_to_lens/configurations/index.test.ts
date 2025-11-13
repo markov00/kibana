@@ -107,7 +107,7 @@ describe('getConfiguration', () => {
           palette: { name: 'default' },
           seriesType: 'area_stacked',
           simpleView: false,
-          splitAccessor: '3',
+          splitAccessor: ['3'],
           xAccessor: '2',
           xScaleType: 'ordinal',
           yConfig: [{ axisMode: 'left', forAccessor: '1' }],

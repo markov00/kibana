@@ -519,7 +519,7 @@ function buildSuggestion({
     layerId,
     seriesType,
     xAccessor: xValue?.columnId,
-    splitAccessor: splitBy?.columnId,
+    splitAccessor: splitBy?.columnId ? [splitBy?.columnId] : undefined,
     accessors,
     yConfig:
       existingLayer && 'yConfig' in existingLayer && existingLayer.yConfig

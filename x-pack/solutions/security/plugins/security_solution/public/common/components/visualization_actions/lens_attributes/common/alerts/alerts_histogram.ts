@@ -39,7 +39,7 @@ export const getAlertsHistogramLensAttributes: GetLensAttributes = ({
             showGridlines: false,
             layerType: 'data',
             xAccessor: columnTimestamp,
-            splitAccessor: columnTopValues,
+            splitAccessor: [columnTopValues],
           },
         ],
         yRightExtent: {

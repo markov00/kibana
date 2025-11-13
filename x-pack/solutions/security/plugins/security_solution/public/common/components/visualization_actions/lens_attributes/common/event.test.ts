@@ -525,7 +525,7 @@ describe('getEventsHistogramLensAttributes', () => {
     expect(result?.current?.state?.visualization).toEqual(
       expect.objectContaining({
         layers: expect.arrayContaining([
-          expect.objectContaining({ splitAccessor: stackByFieldAccessorId }),
+          expect.objectContaining({ splitAccessor: [stackByFieldAccessorId] }),
         ]),
       })
     );
@@ -543,7 +543,7 @@ describe('getEventsHistogramLensAttributes', () => {
     expect(result?.current?.state?.visualization).toEqual(
       expect.objectContaining({
         layers: expect.arrayContaining([
-          expect.not.objectContaining({ splitAccessor: stackByFieldAccessorId }),
+          expect.not.objectContaining({ splitAccessor: [stackByFieldAccessorId] }),
         ]),
       })
     );

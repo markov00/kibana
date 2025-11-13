@@ -67,7 +67,7 @@ export interface XYDataLayerConfig {
   xAccessor?: string;
   simpleView?: boolean;
   yConfig?: YConfig[];
-  splitAccessor?: string;
+  splitAccessor?: string[];
   /**
    * @deprecated use `colorMapping` config
    */

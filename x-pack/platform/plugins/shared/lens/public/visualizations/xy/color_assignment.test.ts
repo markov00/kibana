@@ -18,7 +18,7 @@ describe('color_assignment', () => {
       palette: { type: 'palette', name: 'palette1' },
       layerId: '1',
       layerType: LayerTypes.DATA,
-      splitAccessor: 'split1',
+      splitAccessor: ['split1'],
       accessors: ['y1', 'y2'],
     },
     {
@@ -26,7 +26,7 @@ describe('color_assignment', () => {
       palette: { type: 'palette', name: 'palette2' },
       layerId: '2',
       layerType: LayerTypes.DATA,
-      splitAccessor: 'split2',
+      splitAccessor: ['split2'],
       accessors: ['y3', 'y4'],
     },
   ];

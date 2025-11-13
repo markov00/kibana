@@ -446,7 +446,7 @@ export class LensVisService {
           seriesType: 'bar_stacked',
           xAccessor: 'date_column',
           ...(showBreakdown
-            ? { splitAccessor: 'breakdown_column' }
+            ? { splitAccessor: ['breakdown_column'] }
             : {
                 yConfig: [
                   {
@@ -589,7 +589,7 @@ export class LensVisService {
                 return {
                   ...layer,
                   accessors: ['results'],
-                  splitAccessor: breakdownColumn.name,
+                  splitAccessor: [breakdownColumn.name],
                 };
               }),
             },
