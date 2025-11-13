@@ -1020,7 +1020,8 @@ export const getXyVisualization = ({
           const { groupId } = axisGroup;
 
           warnings.push({
-            // TODO: can we push the group into the metadata and use a correct unique ID here?
+            // Create a unique ID per axis (left/right) since each axis can independently
+            // have mixed positive/negative values when using logarithmic scale
             uniqueId: `${XY_MIXED_LOG_SCALE}${groupId}`,
             severity: 'warning',
             shortMessage: '',
@@ -1050,7 +1051,8 @@ export const getXyVisualization = ({
 
           axisGroup.mixedDomainSeries.forEach(({ accessor }) => {
             warnings.push({
-              // TODO: can we push the group into the metadata and use a correct unique ID here?
+              // Create a unique ID per accessor (dimension) since each metric can independently
+              // have mixed positive/negative values when using logarithmic scale
               uniqueId: `${XY_MIXED_LOG_SCALE_DIMENSION}${accessor}`,
               severity: 'warning',
               shortMessage: '',
