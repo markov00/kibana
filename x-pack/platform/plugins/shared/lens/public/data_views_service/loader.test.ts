@@ -365,6 +365,7 @@ describe('loader', () => {
 
     beforeEach(() => {
       mockGetESQLAdHocDataview.mockReset();
+      (mockDataViews.clearInstanceCache as jest.Mock).mockReset();
     });
 
     it('should return adHocDataViews unchanged when textBasedState is undefined', async () => {
@@ -439,7 +440,7 @@ describe('loader', () => {
       expect(mockGetESQLAdHocDataview).not.toHaveBeenCalled();
     });
 
-    it('should call getESQLAdHocDataview when spec is missing timeFieldName', async () => {
+    it('should merge timeFieldName into existing spec under layer.index when spec is missing timeFieldName', async () => {
       const adHocDataViews: Record<string, DataViewSpec> = {
         dv1: { id: 'dv1', title: 'logs-*' },
       };
@@ -449,9 +450,15 @@ describe('loader', () => {
         },
       } as unknown as TextBasedPersistedState;
 
+      // getESQLAdHocDataview may return a DataView with a different ID than layer.index
       mockGetESQLAdHocDataview.mockResolvedValue({
-        id: 'dv1',
-        toSpec: () => ({ id: 'dv1', title: 'logs-*', timeFieldName: '@timestamp' }),
+        id: 'fresh-generated-id',
+        timeFieldName: '@timestamp',
+        toSpec: () => ({
+          id: 'fresh-generated-id',
+          title: 'logs-*',
+          timeFieldName: '@timestamp',
+        }),
       } as never);
 
       const result = await ensureESQLTimeFieldOnAdHocDataViews({
@@ -471,7 +478,10 @@ describe('loader', () => {
           http: mockHttp,
         })
       );
+      // The spec should be stored under the layer's original ID, not the fresh DataView's ID
       expect(result.dv1).toEqual({ id: 'dv1', title: 'logs-*', timeFieldName: '@timestamp' });
+      expect(result['fresh-generated-id']).toBeUndefined();
+      expect(mockDataViews.clearInstanceCache).toHaveBeenCalledWith('dv1');
     });
 
     it('should use freshDataView.id as the key when layer.index is falsy', async () => {
@@ -514,8 +524,9 @@ describe('loader', () => {
       } as unknown as TextBasedPersistedState;
 
       mockGetESQLAdHocDataview.mockResolvedValue({
-        id: 'dv2',
-        toSpec: () => ({ id: 'dv2', title: 'metrics-*', timeFieldName: '@timestamp' }),
+        id: 'fresh-dv2-id',
+        timeFieldName: '@timestamp',
+        toSpec: () => ({ id: 'fresh-dv2-id', title: 'metrics-*', timeFieldName: '@timestamp' }),
       } as never);
 
       const result = await ensureESQLTimeFieldOnAdHocDataViews({
@@ -530,7 +541,8 @@ describe('loader', () => {
         expect.objectContaining({ query: 'FROM metrics-*' })
       );
       expect(result.dv1).toEqual(adHocDataViews.dv1);
-      expect(result.dv2.timeFieldName).toBe('@timestamp');
+      expect(result.dv2).toEqual({ id: 'dv2', title: 'metrics-*', timeFieldName: '@timestamp' });
+      expect(mockDataViews.clearInstanceCache).toHaveBeenCalledWith('dv2');
     });
 
     it('should not mutate the original adHocDataViews object', async () => {
@@ -544,8 +556,9 @@ describe('loader', () => {
       } as unknown as TextBasedPersistedState;
 
       mockGetESQLAdHocDataview.mockResolvedValue({
-        id: 'dv1',
-        toSpec: () => ({ id: 'dv1', title: 'logs-*', timeFieldName: '@timestamp' }),
+        id: 'fresh-id',
+        timeFieldName: '@timestamp',
+        toSpec: () => ({ id: 'fresh-id', title: 'logs-*', timeFieldName: '@timestamp' }),
       } as never);
 
       const result = await ensureESQLTimeFieldOnAdHocDataViews({

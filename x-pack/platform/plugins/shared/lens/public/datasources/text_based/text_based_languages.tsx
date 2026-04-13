@@ -11,7 +11,8 @@ import React from 'react';
 
 import type { CoreStart } from '@kbn/core/public';
 import type { IStorageWrapper } from '@kbn/kibana-utils-plugin/public';
-import { getESQLAdHocDataview } from '@kbn/esql-utils';
+import { getESQLAdHocDataview, getQuerySummary } from '@kbn/esql-utils';
+import { isAssignment, singleItems, Walker } from '@elastic/esql';
 import type { AggregateQuery } from '@kbn/es-query';
 import { isOfAggregateQueryType } from '@kbn/es-query';
 import type { Reference } from '@kbn/content-management-utils';
@@ -163,6 +164,55 @@ const getSuggestionsByRules = (
     keptLayerIds: [id],
   };
 };
+
+const TEMPORAL_GROUPING_FUNCTIONS = new Set(['bucket', 'tbucket', 'date_trunc']);
+
+/**
+ * Given an ES|QL query and its detected timeFieldName, returns the set of
+ * output column names that represent temporal groupings (produced by BUCKET,
+ * TBUCKET, or DATE_TRUNC operating on the time field), or columns that
+ * directly reference the time field.  Returns an empty set when the query
+ * contains no such groupings.
+ */
+function getTemporalGroupingColumns(esqlQuery: string, timeFieldName: string): Set<string> {
+  const result = new Set<string>();
+  try {
+    const { grouping } = getQuerySummary(esqlQuery);
+    if (!grouping) return result;
+
+    for (const { field, arg } of grouping) {
+      if (field === timeFieldName) {
+        result.add(field);
+        continue;
+      }
+
+      // Unwrap `alias = expr` assignments to get the definition
+      const def = isAssignment(arg) ? [...singleItems(arg.args)][1] : arg;
+      if (!def || def.type !== 'function') continue;
+
+      const funcName = def.name.toLowerCase();
+      if (funcName === '=') continue;
+
+      if (funcName === 'tbucket') {
+        result.add(field);
+        continue;
+      }
+
+      if (!TEMPORAL_GROUPING_FUNCTIONS.has(funcName)) continue;
+
+      let referencesTimeField = false;
+      Walker.walk(def, {
+        visitColumn(col) {
+          if (col.name === timeFieldName) referencesTimeField = true;
+        },
+      });
+      if (referencesTimeField) result.add(field);
+    }
+  } catch {
+    // Don't block initialization on parse errors
+  }
+  return result;
+}
 
 export function getTextBasedDatasource({
   core,
@@ -357,15 +407,27 @@ export function getTextBasedDatasource({
       // This ensures each layer picks up the correct timeFieldName so that
       // time-based filtering works correctly for ES|QL visualizations.
       for (const [layerId, layer] of Object.entries(initState.layers)) {
-        if (layer.timeField || !indexPatterns) {
+        const matchedIndexPattern =
+          indexPatterns && layer.index ? indexPatterns[layer.index] : undefined;
+        const timeFieldName = layer.timeField ?? matchedIndexPattern?.timeFieldName;
+
+        if (!timeFieldName) {
           hydratedLayers[layerId] = layer;
           continue;
         }
 
-        const matchedIndexPattern = layer.index ? indexPatterns[layer.index] : undefined;
-        hydratedLayers[layerId] = matchedIndexPattern?.timeFieldName
-          ? { ...layer, timeField: matchedIndexPattern.timeFieldName }
-          : layer;
+        const temporalColumns = layer.query?.esql
+          ? getTemporalGroupingColumns(layer.query.esql, timeFieldName)
+          : undefined;
+        const columns =
+          temporalColumns && temporalColumns.size > 0
+            ? layer.columns.map((c) =>
+                c.fieldName && temporalColumns.has(c.fieldName) && c.meta?.type !== 'date'
+                  ? { ...c, meta: { ...c.meta, type: 'date' as const } }
+                  : c
+              )
+            : layer.columns;
+        hydratedLayers[layerId] = { ...layer, timeField: timeFieldName, columns };
       }
 
       return {

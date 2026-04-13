@@ -210,10 +210,19 @@ export async function ensureESQLTimeFieldOnAdHocDataViews({
       },
       http,
     });
-    const spec = freshDataView.toSpec(false);
 
-    if (freshDataView.id) {
-      result[freshDataView.id] = spec;
+    if (layer.index && existingSpec) {
+      // Merge only the detected timeFieldName into the existing spec, keeping the
+      // original ID that the layer references. We must NOT pass layer.index as
+      // options.id above — doing so would cache a field-less DataView under that
+      // ID and cause downstream cache hits to return a DataView without fields.
+      result[layer.index] = { ...existingSpec, timeFieldName: freshDataView.timeFieldName };
+      // Evict any stale cached DataView for this ID so downstream
+      // loadIndexPatterns → dataViews.create(spec) creates a fresh instance
+      // from the updated spec (with fields, since skipFetchFields defaults to false).
+      dataViewsService.clearInstanceCache(layer.index);
+    } else if (freshDataView.id) {
+      result[freshDataView.id] = freshDataView.toSpec(false);
     }
   }
 
