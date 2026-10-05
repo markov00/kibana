@@ -401,7 +401,8 @@ export function XYChart({
     shouldRotate,
     formatFactory,
     fieldFormats,
-    yAxisConfigs
+    yAxisConfigs,
+    args.axisFormatPolicies
   );
 
   const axesConfiguration = getAxesConfiguration(
@@ -409,7 +410,8 @@ export function XYChart({
     shouldRotate,
     formatFactory,
     fieldFormats,
-    [...(yAxisConfigs ?? []), ...(xAxisConfig ? [xAxisConfig] : [])]
+    [...(yAxisConfigs ?? []), ...(xAxisConfig ? [xAxisConfig] : [])],
+    args.axisFormatPolicies
   );
 
   const xTitle = xAxisConfig?.title || (xAxisColumn && xAxisColumn.name) || undefined;
@@ -835,7 +837,8 @@ export function XYChart({
                 formatFactory,
                 isEsqlMode,
                 canCreateAlerts,
-                interactive && !args.detailedTooltip
+                interactive && !args.detailedTooltip,
+                args.axisFormatPolicies
               )}
               customTooltip={
                 args.detailedTooltip
@@ -852,6 +855,7 @@ export function XYChart({
                           splitRowAccessor: splitRowId,
                         }}
                         layers={dataLayers}
+                        axesConfiguration={yAxesConfiguration}
                         xDomain={isTimeVis ? rawXDomain : undefined}
                       />
                     )
